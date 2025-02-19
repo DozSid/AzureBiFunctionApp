@@ -135,9 +135,11 @@ def update_hubspot_tickets(tickets):
 
         entities.append(entity)
 
-    table.update_entities(entities=entities, table_name='hubspotticket')
-
-    logging.info('Inserted tickets to Azure Storage')
+    if entities:
+        table.update_entities(entities=entities, table_name='hubspotticket')
+        logging.info(f'Inserted {len(entities)} tickets to Azure Storage')
+    else:
+        logging.warning('No valid tickets to update in Azure Storage')
 
 # Add the function for updating deals
 def update_hubspot_deals(deals):
@@ -182,9 +184,11 @@ def update_hubspot_deals(deals):
         }
         entities.append(entity)
 
-    table.update_entities(entities=entities, table_name='hubspotdeal')
-
-    logging.info('Inserted deals to Azure Storage')
+    if entities:
+        table.update_entities(entities=entities, table_name='hubspotdeal')
+        logging.info(f'Inserted {len(entities)} deals to Azure Storage')
+    else:
+        logging.warning('No valid deals to update in Azure Storage')
 
 def update_hubspot_owners(owners):
     logging.info('Inserting owners to Azure Storage')
