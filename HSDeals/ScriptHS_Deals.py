@@ -26,7 +26,9 @@ class Deals:
             "hs_v2_date_entered_appointmentscheduled", "hs_v2_date_exited_appointmentscheduled",
             "hs_v2_date_exited_qualifiedtobuy", "hs_v2_date_entered_qualifiedtobuy",
             "hs_v2_date_entered_decisionmakerboughtin", "date_entered__demo_in_progress_",
-            "hs_v2_date_entered_contractsent"
+            "hs_v2_date_entered_contractsent","zone","demo_installation_date",
+            "demo_start_date","no__of_demo_days","demo_end_date","no__of_devices",
+            "category_of_hospital","total_no__of_hospital_beds","total_no__of_prospective_dozee_beds__65__target_"
         ]
 
         while True:

@@ -6,7 +6,6 @@ import os
 from pandas import isna
 from typing import Optional
 
-# Existing HubspotTicket definition
 class HubspotTicket(TypedDict, total=False):
     PartitionKey: str
     RowKey: str
@@ -32,7 +31,6 @@ class HubspotTicket(TypedDict, total=False):
     regulatory_reportable_incident : bool
     updated_at : datetime
 
-# New HubspotDeal class
 class HubspotDeal(TypedDict, total=False):
     PartitionKey: str
     RowKey: str
@@ -40,22 +38,22 @@ class HubspotDeal(TypedDict, total=False):
     dealname: str
     dealstage: str
     pipeline: str
-    amount: float
-    closedate: datetime
-    createdate: datetime
-    hs_lastmodifieddate: datetime
+    amount: Optional[float]
+    closedate: Optional[datetime]
+    createdate: Optional[datetime]
+    hs_lastmodifieddate: Optional[datetime]
+    demo_start_date: Optional[datetime]
+    demo_end_date: Optional[datetime]
+    demo_installation_date: Optional[datetime]
     current_status: Optional[str]
-    installation_a_beds: Optional[int]
-    hs_v2_date_entered_176875376: Optional[datetime]
-    hs_v2_date_entered_appointmentscheduled: Optional[datetime]
-    hs_v2_date_exited_appointmentscheduled: Optional[datetime]
-    hs_v2_date_exited_qualifiedtobuy: Optional[datetime]
-    hs_v2_date_entered_qualifiedtobuy: Optional[datetime]
-    hs_v2_date_entered_decisionmakerboughtin: Optional[datetime]
-    date_entered__demo_in_progress_: Optional[datetime]
-    hs_v2_date_entered_contractsent: Optional[datetime]
+    no__of_demo_days: Optional[int]
+    no__of_devices: Optional[int]
+    total_no__of_hospital_beds: Optional[int]
+    total_no__of_prospective_dozee_beds__65__target_: Optional[int]
+    zone: Optional[str]
+    category_of_hospital: Optional[str]
+    hubspot_owner_id: Optional[int]
 
-# New HubspotOwners class
 class HubspotOwners(TypedDict, total=False):
     PartitionKey: str
     RowKey: str
@@ -67,8 +65,27 @@ class HubspotOwners(TypedDict, total=False):
     createdAt: str
     updatedAt: str
     archived: bool
-    # teamName: str
     type: str
+
+class HubspotEvent(TypedDict, total=False):
+    PartitionKey: str
+    RowKey: str
+    hs_event_id: str
+    event_name: str
+    event_type: str
+    hs_pipeline_stage: str
+    hubspot_owner_id: Optional[int]
+    purpose_of_the_event: str
+    zone: str
+    city: str
+    number_of_attendees: Optional[int]
+    speaker_name__if_applicable_: str
+    total_event_roi: Optional[float]
+    single_multi_hospital_event: str
+    event_start_date: Optional[datetime]
+    event_end_date: Optional[datetime]
+    hs_createdate: Optional[datetime]
+    updated_at: Optional[datetime]
 
 class Config:
     access_key = os.environ.get('ASSCESS_KEY')
@@ -141,7 +158,6 @@ def update_hubspot_tickets(tickets):
     else:
         logging.warning('No valid tickets to update in Azure Storage')
 
-# Add the function for updating deals
 def update_hubspot_deals(deals):
     logging.info('Inserting deals to Azure Storage')
     table = azureTableStorage.Table(config=config_obj)
@@ -161,26 +177,24 @@ def update_hubspot_deals(deals):
             "PartitionKey": "deals",
             "RowKey": val_dict.get('hs_object_id', None),
             "hs_deal_id": val_dict.get('hs_object_id', None),
-            "pipeline": escape_special_characters(val_dict.get('pipeline', '')) if val_dict.get('pipeline') else '',
-            "dealname": escape_special_characters(val_dict.get('dealname', '')) if val_dict.get('dealname') else '',
-            "dealstage": escape_special_characters(val_dict.get('dealstage', '')) if val_dict.get('dealstage') else '',
-            "dealtype": escape_special_characters(val_dict.get('dealtype', '')) if val_dict.get('dealtype') else '',
-            "installation_a_beds": val_dict.get('installation_a_beds', None),
-            "current_status": val_dict.get('current_status', None),
+            "pipeline": escape_special_characters(val_dict.get('pipeline', '')),
+            "dealname": escape_special_characters(val_dict.get('dealname', '')),
+            "dealstage": escape_special_characters(val_dict.get('dealstage', '')),
             "amount": val_dict.get('amount', None),
-            "hubspot_owner_id": val_dict.get('hubspot_owner_id', None),
-            "updated_at": updated_at,
+            "closedate": val_dict.get('closedate', None),
             "createdate": val_dict.get('createdate', None),
-            "closedate": val_dict.get('closeddate', None),
             "hs_lastmodifieddate": val_dict.get('hs_lastmodifieddate', None),
-            "hs_v2_date_entered_176875376": val_dict.get('hs_v2_date_entered_176875376', None),
-            "hs_v2_date_entered_appointmentscheduled": val_dict.get('hs_v2_date_entered_appointmentscheduled', None),
-            "hs_v2_date_exited_appointmentscheduled": val_dict.get('hs_v2_date_exited_appointmentscheduled', None),
-            "hs_v2_date_exited_qualifiedtobuy": val_dict.get('hs_v2_date_exited_qualifiedtobuy', None),
-            "hs_v2_date_entered_qualifiedtobuy": val_dict.get('hs_v2_date_entered_qualifiedtobuy', None),
-            "hs_v2_date_entered_decisionmakerboughtin": val_dict.get('hs_v2_date_entered_decisionmakerboughtin', None),
-            "date_entered__demo_in_progress_": val_dict.get('date_entered__demo_in_progress_', None),
-            "hs_v2_date_entered_contractsent": val_dict.get('hs_v2_date_entered_contractsent', None)
+            "demo_start_date": val_dict.get('demo_start_date', None),
+            "demo_end_date": val_dict.get('demo_end_date', None),
+            "demo_installation_date": val_dict.get('demo_installation_date', None),
+            "current_status": val_dict.get('current_status', None),
+            "no__of_demo_days": val_dict.get('no__of_demo_days', None),
+            "no__of_devices": val_dict.get('no__of_devices', None),
+            "total_no__of_hospital_beds": val_dict.get('total_no__of_hospital_beds', None),
+            "total_no__of_prospective_dozee_beds__65__target_": val_dict.get('total_no__of_prospective_dozee_beds__65__target_', None),
+            "zone": val_dict.get('zone', None),
+            "category_of_hospital": val_dict.get('category_of_hospital', None),
+            "hubspot_owner_id": val_dict.get('hubspot_owner_id', None)
         }
         entities.append(entity)
 
@@ -219,3 +233,45 @@ def update_hubspot_owners(owners):
         logging.info(f'Inserted {len(entities)} owners to Azure Storage')
     else:
         logging.warning('No valid owners to update in Azure Storage')
+
+def update_hubspot_events(events):
+    logging.info('Inserting events to Azure Storage')
+    table = azureTableStorage.Table(config=config_obj)
+    entities = []
+
+    for event in events:
+        properties = event.get("properties", {}) 
+        updated_at = event.get("updatedAt", None) 
+
+        val_dict = {
+            key: None if value in [None, "", "null"] else value
+            for key, value in properties.items()
+        }
+
+        entity: HubspotEvent = {
+            "PartitionKey": "events",
+            "RowKey": val_dict.get('hs_object_id', ""),
+            "hs_event_id": val_dict.get('hs_object_id', ""),
+            "event_name": escape_special_characters(val_dict.get('event_name', "")),
+            "event_type": escape_special_characters(val_dict.get('event_type', "")),
+            "hs_pipeline_stage": escape_special_characters(val_dict.get('hs_pipeline_stage', "")),
+            "hubspot_owner_id": val_dict.get('hubspot_owner_id', None),
+            "purpose_of_the_event": escape_special_characters(val_dict.get('purpose_of_the_event', "")),
+            "zone": escape_special_characters(val_dict.get('zone', "")),
+            "city": escape_special_characters(val_dict.get('city', "")),
+            "number_of_attendees": val_dict.get('number_of_attendees', None),
+            "speaker_name__if_applicable_": escape_special_characters(val_dict.get('speaker_name__if_applicable_', "")),
+            "total_event_roi": float(val_dict['total_event_roi']) if val_dict.get('total_event_roi') not in [None, ""] else None,  # Fix: Convert empty to None
+            "single_multi_hospital_event": escape_special_characters(val_dict.get('single_multi_hospital_event', "")),
+            "event_start_date": val_dict.get('event_start_date', None),
+            "event_end_date": val_dict.get('event_end_date', None),
+            "hs_createdate": val_dict.get('hs_createdate', None),
+            "updated_at": updated_at
+        }
+        entities.append(entity)
+
+    if entities:
+        table.update_entities(entities=entities, table_name='hubspotevent')
+        logging.info(f'Inserted {len(entities)} events to Azure Storage')
+    else:
+        logging.warning('No valid events to update in Azure Storage')
