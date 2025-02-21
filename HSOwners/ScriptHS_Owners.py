@@ -13,7 +13,7 @@ class Owners:
 
         while True:
             try:
-                api_response = self.client.crm.owners.owners_api.get_page(after=after)
+                api_response = self.client.crm.owners.owners_api.get_page(after=after,limit=100)
                 all_results.extend(api_response.results)
 
                 if api_response.paging and api_response.paging.next and api_response.paging.next.after:

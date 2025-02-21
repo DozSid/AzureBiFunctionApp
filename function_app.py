@@ -4,6 +4,7 @@ from HSTickets import getHBTickets
 from HSDeals import getHBDeals
 from HSOwners import getHBOwners
 from HSEvents import getHBEvents
+from HSCompanies import getHBCompanies
 
 app = func.FunctionApp()
 
@@ -17,5 +18,6 @@ def HubSpot(myTimer: func.TimerRequest) -> None:
     getHBDeals.getDealsInfoFromHB()
     getHBOwners.getOwnersInfoFromHB()
     getHBEvents.getEventsInfoFromHB()
+    getHBCompanies.getCompaniesInfoFromHB()
 
     logging.info('Python timer trigger function executed.')

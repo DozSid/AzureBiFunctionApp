@@ -4,7 +4,8 @@ from azure import azureTableStorage
 import logging
 import os
 from pandas import isna
-from typing import Optional
+from typing import Optional , List
+from hubspot.crm.companies import SimplePublicObjectWithAssociations
 
 class HubspotTicket(TypedDict, total=False):
     PartitionKey: str
@@ -86,6 +87,21 @@ class HubspotEvent(TypedDict, total=False):
     event_end_date: Optional[datetime]
     hs_createdate: Optional[datetime]
     updated_at: Optional[datetime]
+
+class HubspotCompanies(TypedDict, total=False):
+    PartitionKey: str
+    RowKey: str
+    companyid: int
+    name: Optional[str]
+    domain: Optional[str]
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+    archived: bool
+    proposal_sent_date: Optional[datetime]
+    msa_a_beds: Optional[int]
+    msa_t_beds: Optional[int]
+    installation_a_beds: Optional[int]
+    installation_t_beds: Optional[int]
 
 class Config:
     access_key = os.environ.get('ASSCESS_KEY')
@@ -275,3 +291,52 @@ def update_hubspot_events(events):
         logging.info(f'Inserted {len(entities)} events to Azure Storage')
     else:
         logging.warning('No valid events to update in Azure Storage')
+
+def update_hubspot_companies(companies: List[SimplePublicObjectWithAssociations]):
+    logging.info('Inserting companies to Azure Storage')
+    table = azureTableStorage.Table(config=config_obj)
+    entities = []
+
+    for company in companies:
+        properties = company.properties
+        company_id = properties.get('hs_object_id')
+        name = properties.get('name')
+        domain = properties.get('domain')
+        created_at = company.created_at if hasattr(company, 'created_at') else None
+        updated_at = company.updated_at if hasattr(company, 'updated_at') else None
+
+        # Additional fields from properties (if available)
+        proposal_sent_date = properties.get('proposal_sent_date')
+        msa_a_beds = properties.get('msa_a_beds')
+        msa_t_beds = properties.get('msa_t_beds')
+        installation_a_beds = properties.get('installation_a_beds')
+        installation_t_beds = properties.get('installation_t_beds')
+
+        # Format dates
+        created_at_iso = created_at.isoformat() if created_at else None
+        updated_at_iso = updated_at.isoformat() if updated_at else None
+        proposal_sent_date_iso = proposal_sent_date if isinstance(proposal_sent_date, str) else (proposal_sent_date.isoformat() if proposal_sent_date else None)
+
+        # Construct the entity
+        entity = {
+            "PartitionKey": "companies",
+            "RowKey": str(company_id),  # Ensure RowKey is a string
+            "companyid": str(company_id) if company_id else None,  # Store companyid as a string
+            "name": name if name else None,
+            "domain": domain if domain else None,
+            "created_at": created_at_iso,
+            "updated_at": updated_at_iso,
+            "archived": company.archived if hasattr(company, 'archived') else False,
+            "proposal_sent_date": proposal_sent_date_iso,
+            "msa_a_beds": int(msa_a_beds) if msa_a_beds else None,
+            "msa_t_beds": int(msa_t_beds) if msa_t_beds else None,
+            "installation_a_beds": int(installation_a_beds) if installation_a_beds else None,
+            "installation_t_beds": int(installation_t_beds) if installation_t_beds else None
+        }
+        entities.append(entity)
+
+    if entities:
+        table.update_entities(entities=entities, table_name='hubspotcompany')
+        logging.info(f'Successfully inserted {len(entities)} companies to Azure Storage')
+    else:
+        logging.warning('No valid companies to update in Azure Storage')
