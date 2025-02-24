@@ -102,6 +102,8 @@ class HubspotCompanies(TypedDict, total=False):
     msa_t_beds: Optional[int]
     installation_a_beds: Optional[int]
     installation_t_beds: Optional[int]
+    final_target_month__msa_: Optional[str]
+    final_target_month__installation_: Optional[str]
 
 class Config:
     access_key = os.environ.get('ASSCESS_KEY')
@@ -311,6 +313,8 @@ def update_hubspot_companies(companies: List[SimplePublicObjectWithAssociations]
         msa_t_beds = properties.get('msa_t_beds')
         installation_a_beds = properties.get('installation_a_beds')
         installation_t_beds = properties.get('installation_t_beds')
+        final_target_month__msa_ = properties.get('final_target_month__msa_')
+        final_target_month__installation_ = properties.get('final_target_month__installation_')
 
         # Format dates
         created_at_iso = created_at.isoformat() if created_at else None
@@ -320,8 +324,8 @@ def update_hubspot_companies(companies: List[SimplePublicObjectWithAssociations]
         # Construct the entity
         entity = {
             "PartitionKey": "companies",
-            "RowKey": str(company_id),  # Ensure RowKey is a string
-            "companyid": str(company_id) if company_id else None,  # Store companyid as a string
+            "RowKey": str(company_id),
+            "companyid": str(company_id) if company_id else None,
             "name": name if name else None,
             "domain": domain if domain else None,
             "created_at": created_at_iso,
@@ -331,7 +335,9 @@ def update_hubspot_companies(companies: List[SimplePublicObjectWithAssociations]
             "msa_a_beds": int(msa_a_beds) if msa_a_beds else None,
             "msa_t_beds": int(msa_t_beds) if msa_t_beds else None,
             "installation_a_beds": int(installation_a_beds) if installation_a_beds else None,
-            "installation_t_beds": int(installation_t_beds) if installation_t_beds else None
+            "installation_t_beds": int(installation_t_beds) if installation_t_beds else None,
+            "final_target_month__msa_": str(final_target_month__msa_) if final_target_month__msa_ else None,
+            "final_target_month__installation_": str(final_target_month__installation_) if final_target_month__installation_ else None
         }
         entities.append(entity)
 

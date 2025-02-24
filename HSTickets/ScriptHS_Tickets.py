@@ -15,8 +15,8 @@ class Tickets:
         start_date = end_date - timedelta(days=days_back)
 
         # Format dates as ISO 8601 strings (HubSpot requires this format)
-        start_date_iso = start_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        end_date_iso = end_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        start_date_iso = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+        end_date_iso = end_date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
         properties = [
             "closed_date", "content", "createdate", "creator_name", "customer_code___erp",

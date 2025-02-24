@@ -8,19 +8,20 @@ class Companies:
         self.access_token = access_token
         self.client = hubspot.Client.create(access_token=self.access_token)
 
-    def fetch_all_companies(self, days_back=400):
+    def fetch_all_companies(self, days_back=10):
         all_results = []
         after = None
         end_date = datetime.now(timezone.utc)
         start_date = end_date - timedelta(days=days_back)
 
-        start_date_iso = start_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        end_date_iso = end_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        start_date_iso = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+        end_date_iso = end_date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
         properties = [
             "name", "domain", "createdate", "hs_lastmodifieddate", "archived",
             "archived_at", "proposal_sent_date", "msa_a_beds", "msa_t_beds",
-            "installation_a_beds", "installation_t_beds"
+            "installation_a_beds", "installation_t_beds","final_target_month__msa_",
+            "final_target_month__installation_"
         ]
 
         while True:

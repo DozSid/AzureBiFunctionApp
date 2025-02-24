@@ -15,8 +15,8 @@ class Deals:
         start_date = end_date - timedelta(days=days_back)
 
         # Format dates as ISO 8601 strings (HubSpot requires this format)
-        start_date_iso = start_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
-        end_date_iso = end_date.strftime('%Y-%m-%dT%H:%M:%S.%fZ')
+        start_date_iso = start_date.strftime('%Y-%m-%dT%H:%M:%SZ')
+        end_date_iso = end_date.strftime('%Y-%m-%dT%H:%M:%SZ')
 
         properties = [
             "dealname", "dealstage", "dealtype", "pipeline", "amount", 
@@ -53,14 +53,13 @@ class Deals:
                 )
                 all_results.extend(api_response.results)
 
-                # Check for pagination
                 if api_response.paging and api_response.paging.next and api_response.paging.next.after:
                     after = api_response.paging.next.after
                 else:
-                    break  # Exit loop if no more pages
+                    break
 
             except ApiException as e:
                 logging.error(f"Exception when calling search_api->do_search: {str(e)}")
-                raise  # Re-raise the exception to handle it at a higher level
+                raise
 
         return all_results
