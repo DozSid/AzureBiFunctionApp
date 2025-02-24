@@ -104,6 +104,8 @@ class HubspotCompanies(TypedDict, total=False):
     installation_t_beds: Optional[int]
     final_target_month__msa_: Optional[str]
     final_target_month__installation_: Optional[str]
+    final_target_year__msa_: Optional[int]
+    final_target_year__installation_: Optional[int]
 
 class Config:
     access_key = os.environ.get('ASSCESS_KEY')
@@ -315,6 +317,8 @@ def update_hubspot_companies(companies: List[SimplePublicObjectWithAssociations]
         installation_t_beds = properties.get('installation_t_beds')
         final_target_month__msa_ = properties.get('final_target_month__msa_')
         final_target_month__installation_ = properties.get('final_target_month__installation_')
+        final_target_year__msa_ = properties.get('final_target_year__msa_')
+        final_target_year__installation_ = properties.get('final_target_year__installation_')
 
         # Format dates
         created_at_iso = created_at.isoformat() if created_at else None
@@ -337,7 +341,9 @@ def update_hubspot_companies(companies: List[SimplePublicObjectWithAssociations]
             "installation_a_beds": int(installation_a_beds) if installation_a_beds else None,
             "installation_t_beds": int(installation_t_beds) if installation_t_beds else None,
             "final_target_month__msa_": str(final_target_month__msa_) if final_target_month__msa_ else None,
-            "final_target_month__installation_": str(final_target_month__installation_) if final_target_month__installation_ else None
+            "final_target_month__installation_": str(final_target_month__installation_) if final_target_month__installation_ else None,
+            "final_target_year__msa_": int(final_target_year__msa_) if final_target_year__msa_ else None,
+            "final_target_year__installation_": int(final_target_year__installation_) if final_target_year__installation_ else None
         }
         entities.append(entity)
 

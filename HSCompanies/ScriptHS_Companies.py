@@ -21,7 +21,7 @@ class Companies:
             "name", "domain", "createdate", "hs_lastmodifieddate", "archived",
             "archived_at", "proposal_sent_date", "msa_a_beds", "msa_t_beds",
             "installation_a_beds", "installation_t_beds","final_target_month__msa_",
-            "final_target_month__installation_"
+            "final_target_month__installation_","final_target_year__msa_","final_target_year__installation_"
         ]
 
         while True:
