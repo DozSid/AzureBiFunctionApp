@@ -309,41 +309,40 @@ def update_hubspot_companies(companies: List[SimplePublicObjectWithAssociations]
         created_at = company.created_at if hasattr(company, 'created_at') else None
         updated_at = company.updated_at if hasattr(company, 'updated_at') else None
 
-        # Additional fields from properties (if available)
-        proposal_sent_date = properties.get('proposal_sent_date')
-        msa_a_beds = properties.get('msa_a_beds')
-        msa_t_beds = properties.get('msa_t_beds')
-        installation_a_beds = properties.get('installation_a_beds')
-        installation_t_beds = properties.get('installation_t_beds')
-        final_target_month__msa_ = properties.get('final_target_month__msa_')
-        final_target_month__installation_ = properties.get('final_target_month__installation_')
-        final_target_year__msa_ = properties.get('final_target_year__msa_')
-        final_target_year__installation_ = properties.get('final_target_year__installation_')
+        # Convert numeric fields to integers
+        msa_a_beds = int(properties.get('msa_a_beds', 0)) if properties.get('msa_a_beds') else 0
+        msa_t_beds = int(properties.get('msa_t_beds', 0)) if properties.get('msa_t_beds') else 0
+        installation_a_beds = int(properties.get('installation_a_beds', 0)) if properties.get('installation_a_beds') else 0
+        installation_t_beds = int(properties.get('installation_t_beds', 0)) if properties.get('installation_t_beds') else 0
+        final_target_year__msa_ = int(properties.get('final_target_year__msa_', 0)) if properties.get('final_target_year__msa_') else 0
+        final_target_year__installation_ = int(properties.get('final_target_year__installation_', 0)) if properties.get('final_target_year__installation_') else 0
+
+        # Ensure date fields are in string format
+        proposal_sent_date = properties.get('proposal_sent_date', '')
 
         # Format dates
-        created_at_iso = created_at.isoformat() if created_at else None
-        updated_at_iso = updated_at.isoformat() if updated_at else None
-        proposal_sent_date_iso = proposal_sent_date if isinstance(proposal_sent_date, str) else (proposal_sent_date.isoformat() if proposal_sent_date else None)
+        created_at_iso = created_at.isoformat() if created_at else ''
+        updated_at_iso = updated_at.isoformat() if updated_at else ''
 
         # Construct the entity
         entity = {
             "PartitionKey": "companies",
             "RowKey": str(company_id),
-            "companyid": str(company_id) if company_id else None,
-            "name": name if name else None,
-            "domain": domain if domain else None,
-            "created_at": created_at_iso,
-            "updated_at": updated_at_iso,
-            "archived": company.archived if hasattr(company, 'archived') else False,
-            "proposal_sent_date": proposal_sent_date_iso,
-            "msa_a_beds": int(msa_a_beds) if msa_a_beds else None,
-            "msa_t_beds": int(msa_t_beds) if msa_t_beds else None,
-            "installation_a_beds": int(installation_a_beds) if installation_a_beds else None,
-            "installation_t_beds": int(installation_t_beds) if installation_t_beds else None,
-            "final_target_month__msa_": str(final_target_month__msa_) if final_target_month__msa_ else None,
-            "final_target_month__installation_": str(final_target_month__installation_) if final_target_month__installation_ else None,
-            "final_target_year__msa_": int(final_target_year__msa_) if final_target_year__msa_ else None,
-            "final_target_year__installation_": int(final_target_year__installation_) if final_target_year__installation_ else None
+            "companyid": str(company_id) if company_id else '',
+            "name": str(name) if name else '',
+            "domain": str(domain) if domain else '',
+            "created_at": str(created_at_iso) if created_at_iso else '',
+            "updated_at": str(updated_at_iso) if updated_at_iso else '',
+            "archived": bool(company.archived) if hasattr(company, 'archived') else False,
+            "proposal_sent_date": str(proposal_sent_date),
+            "msa_a_beds": msa_a_beds,
+            "msa_t_beds": msa_t_beds,
+            "installation_a_beds": installation_a_beds,
+            "installation_t_beds": installation_t_beds,
+            "final_target_month__msa_": str(properties.get('final_target_month__msa_', '')),
+            "final_target_month__installation_": str(properties.get('final_target_month__installation_', '')),
+            "final_target_year__msa_": final_target_year__msa_,
+            "final_target_year__installation_": final_target_year__installation_
         }
         entities.append(entity)
 
